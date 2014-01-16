@@ -501,7 +501,7 @@ static char *sprintfCore(char *buf, ssize maxsize, char *spec, va_list args)
 
             case 'S':
                 /* Safe string */
-#if BIT_CHAR_LEN > 1 && UNUSED && KEEP
+#if BIT_CHAR_LEN > 1 && KEEP
                 if (fmt.flags & SPRINTF_LONG) {
                     //  UNICODE - not right wchar
                     safe = websEscapeHtml(va_arg(args, wchar*));
@@ -516,7 +516,7 @@ static char *sprintfCore(char *buf, ssize maxsize, char *spec, va_list args)
 
             case 'w':
                 /* Wide string of wchar characters (Same as %ls"). Null terminated. */
-#if BIT_CHAR_LEN > 1 && UNUSED && KEEP
+#if BIT_CHAR_LEN > 1 && KEEP
                 outWideString(&fmt, va_arg(args, wchar*), -1);
                 break;
 #else
@@ -525,7 +525,7 @@ static char *sprintfCore(char *buf, ssize maxsize, char *spec, va_list args)
 
             case 's':
                 /* Standard string */
-#if BIT_CHAR_LEN > 1 && UNUSED && KEEP
+#if BIT_CHAR_LEN > 1 && KEEP
                 if (fmt.flags & SPRINTF_LONG) {
                     outWideString(&fmt, va_arg(args, wchar*), -1);
                 } else
@@ -674,7 +674,7 @@ static void outString(Format *fmt, char *str, ssize len)
 }
 
 
-#if BIT_CHAR_LEN > 1 && UNUSED && KEEP
+#if BIT_CHAR_LEN > 1 && KEEP
 static void outWideString(Format *fmt, wchar *str, ssize len)
 {
     wchar     *cp;
@@ -1731,7 +1731,6 @@ PUBLIC void bufAdjustStart(WebsBuf *bp, ssize size)
 
 /*
     Flush all data in a buffer. Reset the pointers.
-    MOB - rename. BufDiscard
  */
 PUBLIC void bufFlush(WebsBuf *bp)
 {
@@ -1753,12 +1752,13 @@ PUBLIC void bufCompact(WebsBuf *bp)
     ssize   len;
     
     if (bp->buf) {
-        if (bp->servp < bp->endp && bp->servp > bp->buf) {
-            bufAddNull(bp);
-            len = bufLen(bp) + 1;
-            memmove(bp->buf, bp->servp, len);
-            bp->endp -= bp->servp - bp->buf;
-            bp->servp = bp->buf;
+        if ((len = bufLen(bp)) > 0) {
+            if (bp->servp < bp->endp && bp->servp > bp->buf) {
+                bufAddNull(bp);
+                memmove(bp->buf, bp->servp, len + 1);
+                bp->endp -= bp->servp - bp->buf;
+                bp->servp = bp->buf;
+            }
         } else {
             bp->servp = bp->endp = bp->buf;
             *bp->servp = '\0';
@@ -2468,7 +2468,7 @@ PUBLIC ssize sncopy(char *dest, ssize destMax, char *src, ssize count)
 }
 
 
-#if UNUSED && KEEP
+#if KEEP
 /*
     Return the length of a string limited by a given length
  */

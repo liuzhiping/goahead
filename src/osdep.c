@@ -59,7 +59,7 @@ PUBLIC char *websTempFile(char *dir, char *prefix)
     if (!prefix) {
         prefix = "tmp";
     }
-    return sfmt("%s/%s-%d.tmp", prefix, count++);
+    return sfmt("%s/%s-%d.tmp", dir, prefix, count++);
 }
 
 
@@ -247,14 +247,6 @@ struct hostent* gethostbyname(char *name)
     }
     return (struct hostent*) buffer;
 }
-
-
-#if UNUSED
-struct hostent* gethostbyname2(char *name, int type)
-{
-    return gethostbyname(name);
-}
-#endif
 
 
 ulong hostGetByName(char *name)

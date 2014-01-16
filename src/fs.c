@@ -74,8 +74,6 @@ PUBLIC void websCloseFile(int fd)
 }
 
 
-//  MOB - should this be sbuf or WebsFileInfo?
-
 PUBLIC int websStatFile(char *path, WebsFileInfo *sbuf)
 {
 #if BIT_ROM
@@ -139,6 +137,7 @@ PUBLIC char *websReadWholeFile(char *path)
     }
     buf = walloc(sbuf.size + 1);
     if ((fd = websOpenFile(path, O_RDONLY, 0)) < 0) {
+        wfree(buf);
         return 0;
     }
     websReadFile(fd, buf, sbuf.size);
